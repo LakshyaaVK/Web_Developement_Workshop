@@ -37,7 +37,7 @@ Welcome to my repository for the **Web Development Workshop**, where I’ve comp
 - Whack a mole game
 -  hangman game  
 - Smart Tic Tac Toe game (with DOM and JS logic)  
-- Table generator using input sliders and animations  
+- Table generator  
 - Fully responsive interfaces with Bootstrap
 
 ---
