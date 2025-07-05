@@ -33,8 +33,9 @@ Welcome to my repository for the **Web Development Workshop**, where I’ve comp
 ## 🚀 What I Built
 
 - Interactive calculator  
-- Word and letter counter  
-- Animated hangman game  
+- Word and letter counter
+- Whack a mole game
+-  hangman game  
 - Smart Tic Tac Toe game (with DOM and JS logic)  
 - Table generator using input sliders and animations  
 - Fully responsive interfaces with Bootstrap
