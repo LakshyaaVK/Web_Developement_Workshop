@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangman Game - Easy Mode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(to right, #8e2de2, #4a00e0);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .game-container {
+      background: #222;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .clue {
+      font-size: 1em;
+      margin-bottom: 10px;
+    }
+
+    .word-display {
+      font-size: 2em;
+      letter-spacing: 10px;
+      margin: 20px 0;
+    }
+
+    .status {
+      font-size: 1.2em;
+      margin: 10px 0;
+      color: #ffd700;
+    }
+
+    button.reset {
+      background-color: #00c6ff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button.reset:hover {
+      background-color: #0072ff;
+    }
+
+    .note {
+      font-size: 0.9em;
+      color: #ccc;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Hangman - Easy Mode</h1>
+    <div class="clue" id="clue">Clue: </div>
+    <div class="word-display" id="wordDisplay">_ _ _ _</div>
+    <div class="status" id="status"></div>
+    <button class="reset" onclick="startGame()">New Game</button>
+    <div class="note">🎮 Type letters using your keyboard</div>
+  </div>
+
+  <script>
+    const words = [
+      { word: "cake", clue: "A sweet dessert" },
+      { word: "moon", clue: "Earth’s natural satellite" },
+      { word: "frog", clue: "A green jumping animal" },
+      { word: "book", clue: "You read it" },
+      { word: "ring", clue: "A round piece of jewelry" }
+    ];
+
+    let selectedWord = "";
+    let clue = "";
+    let correctLetters = [];
+    let guessedLetters = [];
+    let wrongGuesses = 0;
+    const maxGuesses = 6;
+
+    const wordDisplay = document.getElementById("wordDisplay");
+    const clueElement = document.getElementById("clue");
+    const status = document.getElementById("status");
+
+    function startGame() {
+      const random = words[Math.floor(Math.random() * words.length)];
+      selectedWord = random.word.toUpperCase();
+      clue = random.clue;
+      correctLetters = [];
+      guessedLetters = [];
+      wrongGuesses = 0;
+      clueElement.textContent = "Clue: " + clue;
+      status.textContent = "";
+      updateWordDisplay();
+    }
+
+    function updateWordDisplay() {
+      let display = "";
+      for (let letter of selectedWord) {
+        display += correctLetters.includes(letter) ? letter + " " : "_ ";
+      }
+      wordDisplay.textContent = display.trim();
+    }
+
+    function handleKeyPress(e) {
+      if (status.textContent.includes("You Won") || status.textContent.includes("You Lost")) return;
+
+      const letter = e.key.toUpperCase();
+      if (!/^[A-Z]$/.test(letter)) return;
+
+      if (guessedLetters.includes(letter)) return;
+      guessedLetters.push(letter);
+
+      if (selectedWord.includes(letter)) {
+        correctLetters.push(letter);
+      } else {
+        wrongGuesses++;
+      }
+
+      updateWordDisplay();
+      checkGameStatus();
+    }
+
+    function checkGameStatus() {
+      if (!wordDisplay.textContent.includes("_")) {
+        status.textContent = "🎉 You Won!";
+      } else if (wrongGuesses >= maxGuesses) {
+        status.textContent = `💀 You Lost! The word was: ${selectedWord}`;
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyPress);
+    startGame();
+  </script>
+</body>
+</html>

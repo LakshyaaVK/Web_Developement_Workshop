@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(to right, #1f4037, #99f2c8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .game-container {
+      background: #222;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      color: white;
+      width: 350px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 2em;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid white;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .cell:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .controls {
+      margin-top: 15px;
+    }
+
+    select, button {
+      padding: 10px 15px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    button {
+      background-color: #00c6ff;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #0072ff;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-size: 1.1em;
+      color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div class="controls">
+      <label for="mode">Game Mode:</label>
+      <select id="mode">
+        <option value="player">Player vs Player</option>
+        <option value="computer">Player vs Computer</option>
+      </select>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="message" id="message"></div>
+    <button onclick="resetGame()">Reset Game</button>
+  </div>
+
+  <script>
+    const boardElement = document.getElementById('board');
+    const message = document.getElementById('message');
+    const modeSelect = document.getElementById('mode');
+    let board = [], currentPlayer = 'X', gameOver = false;
+
+    function initBoard() {
+      board = Array(3).fill().map(() => Array(3).fill(''));
+      boardElement.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = i;
+          cell.dataset.col = j;
+          cell.addEventListener('click', handleClick);
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+
+    function handleClick(e) {
+      if (gameOver) return;
+      const row = +e.target.dataset.row;
+      const col = +e.target.dataset.col;
+      if (board[row][col] !== '') {
+        message.textContent = "Cell already occupied!";
+        return;
+      }
+
+      board[row][col] = currentPlayer;
+      renderBoard();
+
+      if (checkWinner(currentPlayer)) {
+        message.textContent = `${currentPlayer} wins!`;
+        gameOver = true;
+        return;
+      }
+
+      if (isBoardFull()) {
+        message.textContent = "It's a draw!";
+        gameOver = true;
+        return;
+      }
+
+      if (modeSelect.value === 'computer' && currentPlayer === 'X') {
+        currentPlayer = 'O';
+        setTimeout(() => {
+          computerMove();
+          renderBoard();
+          if (checkWinner('O')) {
+            message.textContent = "Computer wins!";
+            gameOver = true;
+          } else if (isBoardFull()) {
+            message.textContent = "It's a draw!";
+            gameOver = true;
+          } else {
+            currentPlayer = 'X';
+          }
+        }, 500);
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      }
+    }
+
+    function computerMove() {
+      let empty = [];
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (board[i][j] === '') empty.push([i, j]);
+        }
+      }
+      const [i, j] = empty[Math.floor(Math.random() * empty.length)];
+      board[i][j] = 'O';
+    }
+
+    function renderBoard() {
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach(cell => {
+        const i = +cell.dataset.row;
+        const j = +cell.dataset.col;
+        cell.textContent = board[i][j];
+      });
+    }
+
+    function checkWinner(p) {
+      for (let i = 0; i < 3; i++) {
+        if (board[i].every(cell => cell === p)) return true;
+        if ([board[0][i], board[1][i], board[2][i]].every(cell => cell === p)) return true;
+      }
+      if ([board[0][0], board[1][1], board[2][2]].every(cell => cell === p)) return true;
+      if ([board[0][2], board[1][1], board[2][0]].every(cell => cell === p)) return true;
+      return false;
+    }
+
+    function isBoardFull() {
+      return board.flat().every(cell => cell !== '');
+    }
+
+    function resetGame() {
+      currentPlayer = 'X';
+      gameOver = false;
+      message.textContent = '';
+      initBoard();
+    }
+
+    resetGame();
+  </script>
+</body>
+</html>
